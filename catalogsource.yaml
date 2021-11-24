@@ -1,0 +1,10 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: redhat-pfe-argocd-namespace
+  namespace: openshift-marketplace
+spec:
+  sourceType: grpc
+  image: quay.io/gpte-devops-automation/argocd-namespace-catalog:latest
+  displayName: Red Hat PFE (ArgoCD Namespace)
+  publisher: Red Hat PFE

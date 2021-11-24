@@ -1,0 +1,24 @@
+# permissions for end users to edit argocdmanageds.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argocdmanaged-editor-role
+rules:
+- apiGroups:
+  - pfe.opentlc.com
+  resources:
+  - argocdmanageds
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - pfe.opentlc.com
+  resources:
+  - argocdmanageds/status
+  verbs:
+  - get

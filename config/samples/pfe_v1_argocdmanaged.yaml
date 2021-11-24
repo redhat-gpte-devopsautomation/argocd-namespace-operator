@@ -1,0 +1,6 @@
+apiVersion: pfe.opentlc.com/v1
+kind: ArgoCDManaged
+metadata:
+  name: argocdmanaged
+spec:
+  argocdNamespace: argocd

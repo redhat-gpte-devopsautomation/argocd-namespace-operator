@@ -1,0 +1,10 @@
+---
+# Use the 'create api' subcommand to add watches to this file.
+- version: v1
+  group: pfe.opentlc.com
+  kind: ArgoCDManaged
+  role: argocdmanaged
+  finalizer:
+    name: finalizer.argocdmanaged.pfe.opentlc.com
+    playbook: playbooks/remove_label.yaml  
+#+kubebuilder:scaffold:watch

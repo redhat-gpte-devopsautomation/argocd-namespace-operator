@@ -1,0 +1,44 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: '[]'
+    capabilities: Basic Install
+  name: argocd-namespace-operator.v0.0.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions: {}
+  description: This operator adds a namespace to a user deployed ArgoCD instance by
+    adding the label argocd.argoproj.io/managed-by label to the namespace.
+  displayName: ArgoCD Namespace Operator
+  icon:
+  - base64data: ""
+    mediatype: ""
+  install:
+    spec:
+      deployments: null
+    strategy: ""
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - argocd
+  - gitops
+  links:
+  - name: Argocd Namespace Operator
+    url: https://argocd-namespace-operator.domain
+  maintainers:
+  - email: wkulhane@redhat.com
+    name: Wolfgang Kulhanek
+  maturity: alpha
+  provider:
+    name: Red Hat Portfolio Field Enablement
+    url: www.redhat.com
+  version: 0.0.0

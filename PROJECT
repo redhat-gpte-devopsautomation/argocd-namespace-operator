@@ -1,0 +1,16 @@
+domain: opentlc.com
+layout:
+- ansible.sdk.operatorframework.io/v1
+plugins:
+  manifests.sdk.operatorframework.io/v2: {}
+  scorecard.sdk.operatorframework.io/v2: {}
+projectName: argocd-namespace-operator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: opentlc.com
+  group: pfe
+  kind: ArgoCDManaged
+  version: v1
+version: "3"

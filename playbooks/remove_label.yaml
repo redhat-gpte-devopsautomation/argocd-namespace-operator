@@ -1,0 +1,17 @@
+- hosts: localhost
+  gather_facts: no
+  tasks:
+  - name: Print message
+    debug:
+      msg: "ArgoCDManaged deleted from namespace {{ ansible_operator_meta.namespace }}. Removing label from namespace."
+
+  # '/' in a key needs to be replaced with '~1'
+  - name: Remove Label from namespace
+    kubernetes.core.k8s_json_patch:
+      api_version: v1
+      kind: Namespace
+      name: "{{ ansible_operator_meta.namespace }}"
+      patch:
+        - op: remove
+          path: /metadata/labels/argocd.argoproj.io~1managed-by
+    ignore_errors: true
