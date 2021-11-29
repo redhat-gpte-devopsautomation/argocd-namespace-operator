@@ -1,0 +1,59 @@
+= ArgoCD Namepace Operator
+
+This operator allows a regular user to add the ArgoCD label to any namespace that they are authorized to create objects in.
+
+If ArgoCD is installed into a custom namespace via the OpenShift GitOps operator it can only manage the namespace it is deployed into.
+
+However often developers want to create additional namespaces and manage those with that namespaced ArgoCD installation. This is possible by adding the label `argocd.argoproj.io/managed-by: <argocd namespace>` to the namespace to be managed. However only cluster administrators are allowed to add labels to a namespace.
+
+This is where this operator helps. A Cluster administrator can deploy this operator to allow regular users to add the label to their namespaces.
+
+== Installation
+
+. As a cluster administrator deploy the catalog source:
++
+[source,sh]
+----
+oc apply -f https://raw.githubusercontent.com/redhat-gpte-devopsautomation/argocd-namespace-operator/main/catalogsource.yaml
+----
+
+. Also as a cluster administrator create a subscription to deploy the operator:
++
+[source,sh]
+----
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: argocd-namespace-operator
+  namespace: openshift-operators
+spec:
+  channel: stable
+  installPlanApproval: Automatic
+  name: argocd-namespace-operator
+  source: argocd-namespace-operator-catalogsource
+  sourceNamespace: openshift-operators
+----
+
+. Once the operator is running regular users can add their namespaces to their ArgoCD installations.
+
+== Usage
+
+In order to use this operator a user will need to create a custom resource, `ArgoCDManaged` into any namespace to be managed by their ArgoCD.
+
+. To add namespace `user-development` to be managed by ArgoCD deployed into `user-argocd` deploy the following `ArgoCDManaged` resource:
++
+[source,sh]
+----
+apiVersion: pfe.opentlc.com/v1
+kind: ArgoCDManaged
+metadata:
+  name: argocdmanaged
+  namespace: user-development
+spec:
+  argocdNamespace: user-argocd
+----
+
+. The operator will add the label `argocd.argoproj.io/managed-by: user-argocd` to the namespace `user-development`.
+
+. Deleting the custom resource will remove the label from the namespace again.
+
