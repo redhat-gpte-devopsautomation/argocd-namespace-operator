@@ -2,7 +2,40 @@
 # tasks file for ArgoCDManaged
 - name: Print message
   debug:
-    msg: "Received request to add namespace {{ ansible_operator_meta.namespace  }} to ArgoCD namespace: {{ argocd_namespace }}"
+    msg: "Received request to add remote namespace {{ ansible_operator_meta.name }} to ArgoCD namespace: {{ ansible_operator_meta.namespace }}"
+
+- name: 'Retrieve secret value from ArgoCD namespace "{{ ansible_operator_meta.namespace }}"'
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: argocd-managed-ns
+    namespace: "{{ ansible_operator_meta.namespace }}"
+  register: secret_result
+
+- set_fact:
+    shared_secret_hash: "{{ secret_result.resources[0].data.shared_secret | default('', true) | hash('sha256') }}"
+    cacheable: no
+    no_log: true
+
+- name: 'Retrieve secret value from remote namespace "{{ ansible_operator_meta.name }}"'
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: argocd-managed-ns
+    namespace: "{{ ansible_operator_meta.name }}"
+  register: remote_secret_result
+
+- set_fact:
+    # If the secret doesn't exist, or the key doesn't exist, we default to an empty value
+    remote_secret_hash: "{{ remote_secret_result.resources[0].data.shared_secret | default('remote_secret_unset_or_not_found', false) | hash('sha256') }}"
+    cacheable: no
+    no_log: true
+
+- set_fact:
+    shared_secret_hashes_match: "{{ shared_secret_hash == remote_secret_hash }}"
+
+- debug:
+    var: shared_secret_hashes_match
 
 - name: Update Namespace with argocd label
   kubernetes.core.k8s:
@@ -11,6 +44,7 @@
       apiVersion: v1
       kind: Namespace
       metadata:
-        name: "{{ ansible_operator_meta.namespace }}"
+        name: "{{ ansible_operator_meta.name }}"
         labels:
-          argocd.argoproj.io/managed-by: "{{ argocd_namespace }}"
+          argocd.argoproj.io/managed-by: "{{ ansible_operator_meta.namespace }}"
+  when: shared_secret_hashes_match

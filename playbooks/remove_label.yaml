@@ -3,15 +3,33 @@
   tasks:
   - name: Print message
     debug:
-      msg: "ArgoCDManaged deleted from namespace {{ ansible_operator_meta.namespace }}. Removing label from namespace."
+      msg: "ArgoCDManaged deleted from namespace {{ ansible_operator_meta.namespace }}."
+
+  - name: 'Read Namespace "{{ ansible_operator_meta.name }}" for expected label'
+    kubernetes.core.k8s_info:
+      api_version: v1
+      kind: Namespace
+      # name: "{{ ansible_operator_meta.name }}"
+      label_selectors:
+        - "argocd.argoproj.io/managed-by={{ ansible_operator_meta.namespace }}"
+      field_selectors:
+        - "metadata.name={{ ansible_operator_meta.name }}"
+    register: labeled_namespace
+
+  - set_fact:
+      namespace_contains_label: "{{ labeled_namespace.resources | length == 1 }}"
+
+  - debug:
+      var: namespace_contains_label
 
   # '/' in a key needs to be replaced with '~1'
   - name: Remove Label from namespace
     kubernetes.core.k8s_json_patch:
       api_version: v1
       kind: Namespace
-      name: "{{ ansible_operator_meta.namespace }}"
+      name: "{{ ansible_operator_meta.name }}"
       patch:
         - op: remove
           path: /metadata/labels/argocd.argoproj.io~1managed-by
     ignore_errors: true
+    when: namespace_contains_label
