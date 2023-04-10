@@ -5,7 +5,7 @@ metadata:
   name: argocdmanaged-editor-role
 rules:
 - apiGroups:
-  - pfe.opentlc.com
+  - ptp.opentlc.com
   resources:
   - argocdmanageds
   verbs:
@@ -17,7 +17,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - pfe.opentlc.com
+  - ptp.opentlc.com
   resources:
   - argocdmanageds/status
   verbs:

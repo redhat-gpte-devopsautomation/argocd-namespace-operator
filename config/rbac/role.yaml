@@ -38,10 +38,10 @@ rules:
       - update
       - watch
   ##
-  ## Rules for pfe.opentlc.com/v1, Kind: ArgoCDManaged
+  ## Rules for ptp.opentlc.com/v1, Kind: ArgoCDManaged
   ##
   - apiGroups:
-      - pfe.opentlc.com
+      - ptp.opentlc.com
     resources:
       - argocdmanageds
       - argocdmanageds/status

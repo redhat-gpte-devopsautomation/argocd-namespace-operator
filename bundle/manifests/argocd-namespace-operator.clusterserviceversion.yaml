@@ -5,7 +5,7 @@ metadata:
     alm-examples: |-
       [
         {
-          "apiVersion": "pfe.opentlc.com/v1",
+          "apiVersion": "ptp.opentlc.com/v1",
           "kind": "ArgoCDManaged",
           "metadata": {
             "name": "argocdmanaged"
@@ -25,7 +25,7 @@ spec:
   customresourcedefinitions:
     owned:
     - kind: ArgoCDManaged
-      name: argocdmanageds.pfe.opentlc.com
+      name: argocdmanageds.ptp.opentlc.com
       version: v1
   description: This operator adds a namespace to a user deployed ArgoCD instance by
     adding the label argocd.argoproj.io/managed-by label to the namespace.
@@ -68,7 +68,7 @@ spec:
           - update
           - watch
         - apiGroups:
-          - pfe.opentlc.com
+          - ptp.opentlc.com
           resources:
           - argocdmanageds
           - argocdmanageds/status

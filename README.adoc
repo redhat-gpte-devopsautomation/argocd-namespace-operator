@@ -36,24 +36,37 @@ spec:
 
 . Once the operator is running regular users can add their namespaces to their ArgoCD installations.
 
+== Overview
+
+* A user who has an ArgoCD cluster creates a shared secret with a known name
+** Kubernetes Secret: argocd-managed-ns with expected key: shared_secret
+* To enroll another namespace to be managed by that installation, they create the same shared secret in the to-be-enrolled namespace as the ArgoCD installation
+* If those match, the controller applies the label.
+
+This forces the user binding a namespace to an installation (by way of label) to have write privileges to secrets in both the ArgoCD installation namespace and the enrolled namespace.
+
+== Some design notes
+
+* The fixed secret name intends to help avoid conflicts. Assuming a single namespace can be enrolled in a single installation, having fixed values helps a developer that wants to accomplish this know that they're potentially stomping on an existing enrollment.
+* The delete logic that cleaned up the finalizer had to be updated to prevent a delete operation in another resource from deleting a label for another enrollment.
+* This doesn't quite watch secrets or any other resources as it stands today, which means that a user deleting a secret resource for enrollment could potentially leave a label hanging. It may be worth having a periodic reconciliation that monitors the state of things, but I've left those kinds of logistics as an exercise for whoever.
+
 == Usage
 
-In order to use this operator a user will need to create a custom resource, `ArgoCDManaged` into any namespace to be managed by their ArgoCD.
+The user should create their ArgoCDManaged resource in the ArgoCD namespace. The ``.metadata.name`` of the ArgoCDManaged resource should align with the namespace to be labeled.
 
-. To add namespace `user-development` to be managed by ArgoCD deployed into `user-argocd` deploy the following `ArgoCDManaged` resource:
-+
-[source,sh]
+The operator will use the namespace containing the ArgoCDManaged resource as the "managing" namespace (i.e. the ArgoCD namespace). So if I wanted to label 10 different namespaces to be managed by one installation, I'd create 10 different ArgoCDManaged resources with the .metadata.name value being the same as each of those namespaces.
+
+Here's what an example would look like:
+
+[source,yaml]
 ----
-apiVersion: pfe.opentlc.com/v1
+apiVersion: ptp.opentlc.com/v1
 kind: ArgoCDManaged
 metadata:
-  name: argocdmanaged
-  namespace: user-development
-spec:
-  argocdNamespace: user-argocd
+  name: developer-project-to-be-labeled
+  namespace: ns-where-argocd-is
+spec: {}
 ----
 
-. The operator will add the label `argocd.argoproj.io/managed-by: user-argocd` to the namespace `user-development`.
-
-. Deleting the custom resource will remove the label from the namespace again.
-
+This has a nice side-effect of allowing you to `oc get --all argocdmanaged` and get an idea of what namespace is enrolled where.

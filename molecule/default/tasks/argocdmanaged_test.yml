@@ -1,5 +1,5 @@
 ---
-- name: Create the pfe.opentlc.com/v1.ArgoCDManaged
+- name: Create the ptp.opentlc.com/v1.ArgoCDManaged
   k8s:
     state: present
     namespace: '{{ namespace }}'
@@ -10,7 +10,7 @@
       type: Successful
       status: "True"
   vars:
-    cr_file: 'pfe_v1_argocdmanaged.yaml'
+    cr_file: 'ptp_v1_argocdmanaged.yaml'
 
 - name: Add assertions here
   assert:

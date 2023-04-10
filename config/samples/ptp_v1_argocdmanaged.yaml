@@ -1,4 +1,4 @@
-apiVersion: pfe.opentlc.com/v1
+apiVersion: ptp.opentlc.com/v1
 kind: ArgoCDManaged
 metadata:
   name: argocdmanaged

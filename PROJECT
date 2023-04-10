@@ -10,7 +10,7 @@ resources:
     crdVersion: v1
     namespaced: true
   domain: opentlc.com
-  group: pfe
+  group: ptp
   kind: ArgoCDManaged
   version: v1
 version: "3"

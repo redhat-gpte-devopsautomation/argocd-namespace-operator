@@ -12,7 +12,7 @@
     namespace: "{{ ansible_operator_meta.namespace }}"
   register: secret_result
 
-- set_fact:
+- ansible.builtin.set_fact:
     shared_secret_hash: "{{ secret_result.resources[0].data.shared_secret | default('', true) | hash('sha256') }}"
     cacheable: no
     no_log: true
@@ -25,19 +25,20 @@
     namespace: "{{ ansible_operator_meta.name }}"
   register: remote_secret_result
 
-- set_fact:
+- ansible.builtin.set_fact:
     # If the secret doesn't exist, or the key doesn't exist, we default to an empty value
     remote_secret_hash: "{{ remote_secret_result.resources[0].data.shared_secret | default('remote_secret_unset_or_not_found', false) | hash('sha256') }}"
     cacheable: no
     no_log: true
 
-- set_fact:
+- ansible.builtin.set_fact:
     shared_secret_hashes_match: "{{ shared_secret_hash == remote_secret_hash }}"
 
-- debug:
+- ansible.builtin.debug:
     var: shared_secret_hashes_match
 
 - name: Update Namespace with argocd label
+  when: shared_secret_hashes_match
   kubernetes.core.k8s:
     state: present
     definition:
@@ -47,4 +48,3 @@
         name: "{{ ansible_operator_meta.name }}"
         labels:
           argocd.argoproj.io/managed-by: "{{ ansible_operator_meta.namespace }}"
-  when: shared_secret_hashes_match
